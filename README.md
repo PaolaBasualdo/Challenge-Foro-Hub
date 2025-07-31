@@ -119,3 +119,10 @@
 **Paola Ivana Basualdo**  
 🌎 Argentina  
 📧 Contacto: paoladeembalse@gmail.com
+
+| [<img src="https://avatars.githubusercontent.com/u/117169838?v=4" width=115><br><sub>Paola Ivana Basualdo</sub>](https://github.com/PaolaBasualdo) |  
+| :---: |  
+
+---
+
+📌 *Proyecto realizado como parte del curso Practicando Spring Framework: Challenge Foro Hub en el Programa ONE de Alura y Oracle.*  
