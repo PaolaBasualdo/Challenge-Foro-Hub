@@ -86,7 +86,7 @@
 ## 📁 Acceso al proyecto
 
 🔗 Repositorio en GitHub:  
-👉 [LiterAlura](https://github.com/PaolaBasualdo/Challenge-Foro-Hub.git)
+👉 [Challenge-Foro-Hub](https://github.com/PaolaBasualdo/Challenge-Foro-Hub.git)
 
 ---
 
