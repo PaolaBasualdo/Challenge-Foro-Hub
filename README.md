@@ -68,11 +68,17 @@
 ## 🔧 Funcionalidades
 
 ✅ Registro de alumnos
+
 ✅ Registro de tópicos asociados a alumnos
+
 ✅ Listado paginado de tópicos activos
+
 ✅ Actualización y eliminación lógica (soft delete) de tópicos
+
 ✅ Detalle de tópicos por ID
+
 ✅ Autenticación de usuarios con login y contraseña
+
 🚧 Generación y validación de token JWT
 
 ---
