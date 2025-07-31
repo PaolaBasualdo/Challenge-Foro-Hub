@@ -11,6 +11,6 @@ public record DatosRegistroTopico(
         @NotBlank String titulo,
         @NotBlank String mensaje,
         @NotNull Long idAlumno,
-        @NotNull Curso curso,
-        @NotNull LocalDateTime fechaCreacion
+        @NotNull Curso curso
+        //@NotNull LocalDateTime fechaCreacion
 ) {}

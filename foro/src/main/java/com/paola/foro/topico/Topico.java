@@ -41,7 +41,7 @@ public class Topico {
         this.mensaje = datos.mensaje();
         this.alumno = alumno;
         this.curso = datos.curso();
-        this.fechaCreacion = datos.fechaCreacion();
+        this.fechaCreacion = LocalDateTime.now();
     }
 
     public void actualizarInformacion(@Valid DatosActualizarTopico datos) {

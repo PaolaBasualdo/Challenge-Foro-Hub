@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -49,6 +50,32 @@ public class TopicoController {
     public Page<DatosListaTopico> listar(@PageableDefault(size = 10, sort = "fechaCreacion") Pageable paginacion) {
         return repository.findByActivoTrue(paginacion).map(DatosListaTopico::new);
     }
+
+    @GetMapping("/{id}")
+    public DatosDetallesTopico obtenerDetalle(@PathVariable Long id) {
+        var topicoOptional = repository.findById(id);
+        if (topicoOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tópico no encontrado");
+        }
+
+        var topico = topicoOptional.get();
+
+        if (!topico.getActivo()) {
+            throw new ResponseStatusException(HttpStatus.GONE, "El tópico está inactivo");
+        }
+
+        return new DatosDetallesTopico(
+                topico.getId(),
+                topico.getTitulo(),
+                topico.getMensaje(),
+                topico.getFechaCreacion(),
+                topico.getActivo(),
+                topico.getAlumno().getNombre(),
+                topico.getCurso()
+        );
+    }
+
+
 
     @PutMapping("/{id}")
     @Transactional
