@@ -1,21 +1,16 @@
 package com.paola.foro.controller;
 
-
-
 import com.paola.foro.alumno.AlumnoRepository;
 import com.paola.foro.topico.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
-
-
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/topicos")
@@ -27,44 +22,44 @@ public class TopicoController {
     @Autowired
     private AlumnoRepository alumnoRepository;
 
-
     @PostMapping
     @Transactional
-    public void registrar(@RequestBody @Valid DatosRegistroTopico datos) {
-        boolean existe = repository.existsByTituloAndMensaje(datos.titulo(), datos.mensaje());
-        if (existe) {
-            throw new IllegalArgumentException("Ya existe un tópico con el mismo título y mensaje.");
+    public ResponseEntity<?> registrar(@RequestBody @Valid DatosRegistroTopico datos) {
+        if (repository.existsByTituloAndMensaje(datos.titulo(), datos.mensaje())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya existe un tópico con el mismo título y mensaje.");
         }
 
         var alumnoOptional = alumnoRepository.findById(datos.idAlumno());
         if (alumnoOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Alumno no encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Alumno no encontrado");
         }
 
         Topico topico = new Topico(datos, alumnoOptional.get());
         repository.save(topico);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
     @GetMapping
-    public Page<DatosListaTopico> listar(@PageableDefault(size = 10, sort = "fechaCreacion") Pageable paginacion) {
-        return repository.findByActivoTrue(paginacion).map(DatosListaTopico::new);
+    public ResponseEntity<Page<DatosListaTopico>> listar(@PageableDefault(size = 10, sort = "fechaCreacion") Pageable paginacion) {
+        var page = repository.findByActivoTrue(paginacion).map(DatosListaTopico::new);
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")
-    public DatosDetallesTopico obtenerDetalle(@PathVariable Long id) {
+    public ResponseEntity<?> obtenerDetalle(@PathVariable Long id) {
         var topicoOptional = repository.findById(id);
         if (topicoOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tópico no encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tópico no encontrado");
         }
 
         var topico = topicoOptional.get();
 
         if (!topico.getActivo()) {
-            throw new ResponseStatusException(HttpStatus.GONE, "El tópico está inactivo");
+            return ResponseEntity.status(HttpStatus.GONE).body("El tópico está inactivo");
         }
 
-        return new DatosDetallesTopico(
+        var datos = new DatosDetallesTopico(
                 topico.getId(),
                 topico.getTitulo(),
                 topico.getMensaje(),
@@ -73,27 +68,36 @@ public class TopicoController {
                 topico.getAlumno().getNombre(),
                 topico.getCurso()
         );
+
+        return ResponseEntity.ok(datos);
     }
-
-
 
     @PutMapping("/{id}")
     @Transactional
-    public void actualizar(@PathVariable Long id, @RequestBody @Valid DatosActualizarTopico datos) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody @Valid DatosActualizarTopico datos) {
         var topicoOptional = repository.findById(id);
         if (topicoOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tópico no encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tópico no encontrado");
         }
 
         var topico = topicoOptional.get();
         topico.actualizarInformacion(datos);
+
+        return ResponseEntity.ok().build();
     }
 
-
-    @Transactional
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        var topico = repository.getReferenceById(id);
+    @Transactional
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        var topicoOptional = repository.findById(id);
+        if (topicoOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tópico no encontrado");
+        }
+
+        var topico = topicoOptional.get();
         topico.eliminar();
+
+        return ResponseEntity.noContent().build();
     }
 }
+
